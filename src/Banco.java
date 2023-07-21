@@ -32,10 +32,7 @@ public class Banco {
     public float getSaldo(){
         return this.saldo;
     }
-    public void setSaldo(float s){
-
-        this.saldo = s;
-    }
+    public void setSaldo(float s){this.saldo = s;}
 
     public boolean getStatus(){
         return this.status;
@@ -46,107 +43,75 @@ public class Banco {
 
 
     //Métodos
-    public void acessarConta(){
-        int numDigitado = 0;
-        Scanner scanner = new Scanner(System.in);
+  public void estadoAtual(){
+      System.out.println("Conta: " + this.getNumConta() );
+      System.out.println("Tipo: " + this.getTipo());
+      System.out.println("Dono: " + this.getDono());
+      System.out.println("Saldo: " + this.getSaldo());
+      System.out.println("Status: " + this.getStatus());
+  }
 
-        System.out.println("Digite seu nome: ");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta (corrente ou poupança");
-        this.tipo = scanner.next();
-        System.out.println("Digite o número da conta: ");
-        numDigitado = scanner.nextInt();
-        if(numDigitado == this.numConta){
-            System.out.println("Conta acessada com sucesso!");
-            System.out.println("Seu saldo: " + this.saldo);
-        }else{
-            System.out.println("Não existe conta com esse número!");
-        }
-    }
-
-    public void statusConta() {
-        if (this.status == true) {
-            abrirConta();
-        } if(this.status == false) {
-            fecharConta();
-        }
-    }
-    public void abrirConta(){
-        Scanner scanner = new Scanner(System.in);
-        Random random = new Random();
-        Banco novaConta = new Banco();
-
-        System.out.println("Digite seu nome");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta (corrente ou poupança)");
-        this.tipo = scanner.next();
-        setNumConta((random.nextInt(9000) + 1000));
-
-        /*if(this.tipo != "corrente" || this.tipo != "poupança") {
-            System.out.println("Você digitou uma opcão inválida, tente novamente");
-            return;*/
-        if (this.tipo.equalsIgnoreCase("corrente")) {
-            System.out.println("Você abriu uma conta corrente e ganhou um saldo de 50 reais");
-            this.saldo = 50.00f;
+    public void abrirConta(String t){
+            this.setTipo(t);
             this.setStatus(true);
-        } else if(this.tipo.equalsIgnoreCase("poupança")) {
-            System.out.println("você abriu uma conta poupança e ganhou 150 reais de saldo");
-            this.saldo = 150f;
-            this.setStatus(false);
-        }else{
-            System.out.println("Tipo de conta inválido. Tipos válidos: 'corrente' ou 'popança'");
-            return;
-
-        /*System.out.println("Digite seu nome: ");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta que deseja abrir: Corrente ou poupança");
-        this.tipo = scanner.next();
-
-        setNumConta(random.nextInt(9000) + 1000);
-
-        if(this.tipo.equalsIgnoreCase("corrente")){
-            System.out.println("Você abriu uma conta corrente e ganhou 50 reais de saldo");
-            this.saldo = 50.00f;
-            this.setStatus(true);
-        }else if(this.tipo.equalsIgnoreCase("poupança")){
-            System.out.println("você abriu uma conta poupança e ganhou 150 reais de saldo");
-            this.saldo = 150.00f;
-            this.setStatus(true);
-        }else{
-            System.out.println("Tipo de conta inválido. Tipos válidos: 'corrente' ou 'popança'");
-            return;*/
+            if(t == "CC"){
+                this.setSaldo(50.00f);
+                System.out.println("conta corrente aberta com sucesso!");
+            }else if(t == "CP"){
+                this.setSaldo(150.00f);
+                System.out.println("conta poupança aberta com sucesso!");
+            }else {
+                System.out.println("Opcão inválida ");
+            }
         }
-
-        System.out.println("Conta criada com sucesso!");
-        System.out.println("Número da conta: " + this.getNumConta());
-        System.out.println("tipo de conta: " + this.getTipo());
-        System.out.println("Dono da conta " + this.getDono());
-        System.out.println("Saldo: " + this.getSaldo());
-        System.out.println("Status: " + this.getStatus());
-        return;
-    }
     public void fecharConta(){
-        int numDigitado2 = 0;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o número da conta que deseja excluir: ");
-        numDigitado2 = scanner.nextInt();
-        if(numDigitado2 == numConta){
+        if(this.getSaldo() > 0){
+            System.out.println("Conta não pode ser fechada pois tem dinheiro");
+        } else if (this.getSaldo() < 0) {
+            System.out.println("Conta não pode ser fechada pois está negativada");
+        } else{
             this.setStatus(false);
-            System.out.println("A conta número " + numConta + "foi excluída com sucesso!");
-        }else{
-            System.out.println("Conta número " + numDigitado2 + "não encontrada, tente novamente");
-            return;
+            System.out.println("conta fechada com sucesso");
         }
-
     }
-    public void depositar(){
-
+    public void depositar(float v) {
+        if (this.getStatus()) {
+            this.setSaldo(this.getSaldo() + v);
+            System.out.println("Deposito realizado com sucesso na conta de" + this.getDono());
+        } else{
+            System.out.println("impossivel depositar em uma conta fechada");
+        }
     }
-    public void sacar(){
-
-    }
+    public void sacar(float v) {
+        if (this.getStatus()) {
+            if (this.getSaldo() < v) {
+                System.out.println("Saldo insuficiente");
+            }
+            else if (this.getSaldo() >= v){
+                this.setSaldo(this.getSaldo() - v);
+                System.out.println("Saque realizado com sucesso");
+               }
+            }else {
+            System.out.println("impossivel depositar em uma conta fechada");
+          }
+        }
     public void pagarMensal(){
-
+        int v = 0;
+        if(this.getTipo() == "CC"){
+            v = 12;
+        }else if (this.getTipo() == "CP"){
+            v = 20;
+        }
+        if (this.getStatus()){
+            this.setSaldo(this.getSaldo() - v);
+            System.out.println("Mensalidade paga valor: " + v);
+        } else{
+            System.out.println("Impossivel pagar uma conta fechada");
+        }
     }
-
+    // método construtor
+    public void Banco(){
+        this.setSaldo(0);
+        this.setStatus(false);
+    }
 }

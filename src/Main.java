@@ -2,37 +2,23 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scannerOpcaoMenu = new Scanner(System.in);
-        Banco banco = new Banco();
-        int opcao1;
-        int numConta;
-        do{
-            System.out.println("========= Menu =========");
-            System.out.println("1. Abrir nova conta");
-            System.out.println("2. Fechar conta");
-            System.out.println("3. Acessar conta");
-            System.out.println("0. Sair");
-            System.out.println("Digite a opcão desejada: ");
-            opcao1 = scannerOpcaoMenu.nextInt();
+        Banco p1 = new Banco();
+        p1.setNumConta(1111);
+        p1.setDono("Carlos");
+        p1.abrirConta("CC");
 
-            switch(opcao1){
-                case 1:
-                    banco.abrirConta();
-                    break;
-                case 2:
-                    banco.fecharConta();
-                    break;
-                case 3:
-                    numConta = scannerOpcaoMenu.nextInt();
-                    banco.acessarConta();
-                    break;
-                case 0:
-                    System.out.println("Encerrando o programa...");
-                    break;
-                default:
-                    System.out.println("Opcão inválida. tente novamente.");
-            }
-        } while (opcao1 !=0);
+        Banco p2 = new Banco();
+        p2.setNumConta(3322);
+        p2.setDono("Lucas");
+        p2.abrirConta("CP");
 
+        p1.depositar(100);
+        p2.depositar(500);
+
+        p2.sacar(100);
+        p1.fecharConta();
+
+        p1.estadoAtual();
+        p2.estadoAtual();
     }
 }
