@@ -148,5 +148,9 @@ public class Banco {
     public void pagarMensal(){
 
     }
+    public void Banco(){
+        this.setSaldo(0);
+        this.setStatus(false);
+    }
 
 }
