@@ -10,7 +10,11 @@ public class Main{
         while(true){
             System.out.println("\nEscolha uma opção");
             System.out.println("1 - Abrir conta");
-            System.out.println("2 - sair");
+            System.out.println("2 - Fechar Conta");
+            System.out.println("3 - Acessar conta");
+            System.out.println("4 - Sacar");
+            System.out.println("5 - Depositar");
+            System.out.println("0 - sair");
             System.out.println("Opcão: ");
 
             int opcao = scan.nextInt();
@@ -21,6 +25,18 @@ public class Main{
                     banco.abrirConta();
                     break;
                 case 2:
+                    banco.fecharConta();
+                    break;
+                case 3:
+                    banco.acessarConta();
+                    break;
+                case 4:
+                   banco.sacar();
+                   break;
+                case 5:
+                    banco.depositar();
+                    break;
+                case 0:
                     scan.close();
                     System.exit(0);
                     break;

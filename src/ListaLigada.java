@@ -11,7 +11,8 @@ public class ListaLigada implements Iterable<Pessoa> {
         }
     }
         public Iterator<Pessoa> iterator(){
-            return new ListaLigadaIterator(primeiro);
+
+        return new ListaLigadaIterator(primeiro);
         }
 
     private No primeiro;
@@ -50,5 +51,23 @@ public class ListaLigada implements Iterable<Pessoa> {
                 ultimo.proximo = novoNo;
                 ultimo = novoNo;
             }
+    }
+
+    public void removerPessoa(Pessoa pessoa){
+        No anterior = null;
+        No atual = primeiro;
+
+        while (atual != null){
+            if(atual.pessoa.equals((pessoa))){
+                if(anterior == null){
+                    primeiro = atual.proximo;
+                }else{
+                    anterior.proximo = atual.proximo;
+                }
+                return;
+            }
+            anterior = atual;
+            atual = atual.proximo;
+        }
     }
 }

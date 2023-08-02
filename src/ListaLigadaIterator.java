@@ -3,8 +3,9 @@ import java.util.Iterator;
 public class ListaLigadaIterator implements Iterator<Pessoa> {
     private ListaLigada.No atual;
 
-    public ListaLigadaIterator(ListaLigada.No primeiro){
+    public ListaLigadaIterator(ListaLigada.No primeiro) {
         atual = primeiro;
+
     }
 
     public boolean hasNext(){
