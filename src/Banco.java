@@ -1,6 +1,9 @@
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Banco{
     private int numConta;
@@ -40,6 +43,23 @@ public class Banco{
         Pessoa cliente = new Pessoa(nome, email, senha, cpf, numConta, saldo);
 
         listaClientes.adicionarPessoa(cliente);
+
+        try{
+            Connection conexao = ConexaoBD.obterConexao();
+            String sql = "INSERT INTO TabelaClientes3 (nome, email, senha, cpf, numConta, saldo)" +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getEmail());
+            stmt.setString(3, cliente.getSenha());
+            stmt.setDouble(4, cliente.getCpf());
+            stmt.setInt(5, cliente.getNumConta());
+            stmt.setFloat(6, cliente.getSaldo());
+            stmt.executeUpdate();
+            stmt.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     private boolean verificarEmailCadastrado(String email){
