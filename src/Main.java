@@ -1,21 +1,26 @@
 import java.util.Scanner;
 
-public class Main {
-    public static void main(String[] args) {
-        Scanner scannerOpcaoMenu = new Scanner(System.in);
+public class Main{
+    public static void main(String args[]){
+        Scanner scan = new Scanner(System.in);
         Banco banco = new Banco();
-        int opcao1;
-        int numConta;
-        do{
-            System.out.println("========= Menu =========");
-            System.out.println("1. Abrir nova conta");
-            System.out.println("2. Fechar conta");
-            System.out.println("3. Acessar conta");
-            System.out.println("0. Sair");
-            System.out.println("Digite a opcão desejada: ");
-            opcao1 = scannerOpcaoMenu.nextInt();
 
-            switch(opcao1){
+        System.out.println("Bem Vindo ao Banco!");
+
+        while(true){
+            System.out.println("\nEscolha uma opção");
+            System.out.println("1 - Abrir conta");
+            System.out.println("2 - Fechar Conta");
+            System.out.println("3 - Acessar conta");
+            System.out.println("4 - Sacar");
+            System.out.println("5 - Depositar");
+            System.out.println("0 - sair");
+            System.out.println("Opcão: ");
+
+            int opcao = scan.nextInt();
+            scan.nextInt();
+
+            switch (opcao){
                 case 1:
                     banco.abrirConta();
                     break;
@@ -23,16 +28,22 @@ public class Main {
                     banco.fecharConta();
                     break;
                 case 3:
-                    numConta = scannerOpcaoMenu.nextInt();
                     banco.acessarConta();
                     break;
+                case 4:
+                   banco.sacar();
+                   break;
+                case 5:
+                    banco.depositar();
+                    break;
                 case 0:
-                    System.out.println("Encerrando o programa...");
+                    scan.close();
+                    System.exit(0);
                     break;
                 default:
-                    System.out.println("Opcão inválida. tente novamente.");
+                    System.out.println("opcão inválida");
+                    break;
             }
-        } while (opcao1 !=0);
-
+        }
     }
 }

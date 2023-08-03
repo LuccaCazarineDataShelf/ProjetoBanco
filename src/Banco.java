@@ -1,156 +1,198 @@
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.ArrayList;
-public class Banco {
-    private ArrayList<Banco> contas = new ArrayList<>();
-    //Atributos
-    public int numConta;
-    protected String tipo;
-    private String dono;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class Banco{
+    private int numConta;
     private float saldo;
-    private boolean status;
+    private String tipo;
+    private boolean statusConta;
+    private ListaLigada listaClientes;
 
-    //getters and setters
-    public int getNumConta(){
-        return this.numConta;
-    }
-    public void setNumConta(int nC){
-        this.numConta = nC;
-    }
-    public String getTipo(){
-        return this.tipo;
-    }
-    public void setTipo(String t){
-        this.tipo = t;
-    }
-    public String getDono(){
-        return this.dono;
-    }
-    public void setDono(String d){
-        this.dono = d;
-    }
-    public float getSaldo(){
-        return this.saldo;
-    }
-    public void setSaldo(float s){
+    Scanner scan = new Scanner(System.in);
 
-        this.saldo = s;
+    public Banco(){
+        this.listaClientes = new ListaLigada();
     }
 
-    public boolean getStatus(){
-        return this.status;
-    }
-    public void setStatus(boolean st){
-        this.status = st;
-    }
-
-
-    //Métodos
-    public void acessarConta(){
-        int numDigitado = 0;
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Digite seu nome: ");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta (corrente ou poupança");
-        this.tipo = scanner.next();
-        System.out.println("Digite o número da conta: ");
-        numDigitado = scanner.nextInt();
-        if(numDigitado == this.numConta){
-            System.out.println("Conta acessada com sucesso!");
-            System.out.println("Seu saldo: " + this.saldo);
-        }else{
-            System.out.println("Não existe conta com esse número!");
+    public void abrirConta() {
+        System.out.println("digite seu nome: ");
+        String nome = scan.nextLine();
+        System.out.println("digite seu email: ");
+        String email = scan.nextLine();
+        if (verificarEmailCadastrado(email)) {
+            System.out.println("Este email ja está cadastrado á uma conta, tente novamnte!");
+            return;
         }
-    }
+        System.out.println("Crie uma senha: ");
+        String senha  = scan.nextLine();
+        System.out.println("Digite o cpf: ");
+        double cpf = scan.nextDouble();
+        scan.nextLine();
+        System.out.println("Digite o tipo de conta: Corrente ou Poupança");
+        tipo = scan.nextLine();
 
-    public void statusConta() {
-        if (this.status == true) {
-            abrirConta();
-        } if(this.status == false) {
-            fecharConta();
-        }
-    }
-    public void abrirConta(){
-        Scanner scanner = new Scanner(System.in);
         Random random = new Random();
-        Banco novaConta = new Banco();
+        numConta = 1000 + random.nextInt(9000);
+        System.out.println("parabens! voce criou sua conta " + this.getTipo() + "!"
+                + "Número da conta: " + this.getNumConta());
 
-        System.out.println("Digite seu nome");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta (corrente ou poupança)");
-        this.tipo = scanner.next();
-        setNumConta((random.nextInt(9000) + 1000));
+        Pessoa cliente = new Pessoa(nome, email, senha, cpf, numConta, saldo);
 
-        /*if(this.tipo != "corrente" || this.tipo != "poupança") {
-            System.out.println("Você digitou uma opcão inválida, tente novamente");
-            return;*/
-        if (this.tipo.equalsIgnoreCase("corrente")) {
-            System.out.println("Você abriu uma conta corrente e ganhou um saldo de 50 reais");
-            this.saldo = 50.00f;
-            this.setStatus(true);
-        } else if(this.tipo.equalsIgnoreCase("poupança")) {
-            System.out.println("você abriu uma conta poupança e ganhou 150 reais de saldo");
-            this.saldo = 150f;
-            this.setStatus(false);
-        }else{
-            System.out.println("Tipo de conta inválido. Tipos válidos: 'corrente' ou 'popança'");
-            return;
+        listaClientes.adicionarPessoa(cliente);
 
-        /*System.out.println("Digite seu nome: ");
-        this.dono = scanner.next();
-        System.out.println("Digite o tipo de conta que deseja abrir: Corrente ou poupança");
-        this.tipo = scanner.next();
-
-        setNumConta(random.nextInt(9000) + 1000);
-
-        if(this.tipo.equalsIgnoreCase("corrente")){
-            System.out.println("Você abriu uma conta corrente e ganhou 50 reais de saldo");
-            this.saldo = 50.00f;
-            this.setStatus(true);
-        }else if(this.tipo.equalsIgnoreCase("poupança")){
-            System.out.println("você abriu uma conta poupança e ganhou 150 reais de saldo");
-            this.saldo = 150.00f;
-            this.setStatus(true);
-        }else{
-            System.out.println("Tipo de conta inválido. Tipos válidos: 'corrente' ou 'popança'");
-            return;*/
+        try{
+            Connection conexao = ConexaoBD.obterConexao();
+            String sql = "INSERT INTO TabelaClientes3 (nome, email, senha, cpf, numConta, saldo)" +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getEmail());
+            stmt.setString(3, cliente.getSenha());
+            stmt.setDouble(4, cliente.getCpf());
+            stmt.setInt(5, cliente.getNumConta());
+            stmt.setFloat(6, cliente.getSaldo());
+            stmt.executeUpdate();
+            stmt.close();
+        }catch (SQLException e){
+            e.printStackTrace();
         }
-
-        System.out.println("Conta criada com sucesso!");
-        System.out.println("Número da conta: " + this.getNumConta());
-        System.out.println("tipo de conta: " + this.getTipo());
-        System.out.println("Dono da conta " + this.getDono());
-        System.out.println("Saldo: " + this.getSaldo());
-        System.out.println("Status: " + this.getStatus());
-        return;
     }
-    public void fecharConta(){
-        int numDigitado2 = 0;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o número da conta que deseja excluir: ");
-        numDigitado2 = scanner.nextInt();
-        if(numDigitado2 == numConta){
-            this.setStatus(false);
-            System.out.println("A conta número " + numConta + "foi excluída com sucesso!");
+
+    private boolean verificarEmailCadastrado(String email){
+        for (Pessoa cliente : listaClientes){
+            if(cliente.getEmail().equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public void fecharConta() {
+        System.out.println("Digite o número da conta");
+        int numDigitado = scan.nextInt();
+        scan.nextLine();
+
+        Pessoa cliente  = buscarConta(numDigitado);
+        if(cliente != null){
+            listaClientes.removerPessoa(cliente);
+            System.out.println("Conta removida com sucesso!");
         }else{
-            System.out.println("Conta número " + numDigitado2 + "não encontrada, tente novamente");
+            System.out.println("Conta não encontrada!");
+        }
+    }
+
+    private Pessoa buscarConta(int numDigitado){
+        for(Pessoa cliente : listaClientes){
+            if(cliente.getNumConta() == numDigitado){
+                return cliente;
+            }
+        }
+        return null;
+    }
+    public void acessarConta(){
+        System.out.println("Digite o número da conta que deseja acessar: ");
+        int numDigitado2 = scan.nextInt();
+        scan.nextLine();
+
+        Pessoa cliente = buscarConta(numDigitado2);
+        if(cliente != null){
+            System.out.println("Conta acessada com sucesso! Dados: ");
+            System.out.println("tipo da conta: " + getTipo());
+            System.out.println("Saldo: " + cliente.getSaldo());
+        }else{
+            System.out.println("Conta não encontrada! tente novamente.");
             return;
         }
-
-    }
-    public void depositar(){
-
     }
     public void sacar(){
+        System.out.println("Digite o número da sua conta.");
+        int numDigitado3 = scan.nextInt();
+        scan.nextLine();
 
+        Pessoa cliente = buscarConta(numDigitado3);
+        if(cliente != null){
+            System.out.println("seu saldo: " + cliente.getSaldo());
+            System.out.println("Quanto deseja sacar? ");
+            float saque = scan.nextFloat();
+            if(saque > cliente.getSaldo()){
+                System.out.println("Você nao tem dinheiro para realizar esse saque ");
+            }else{
+                this.setSaldo(cliente.getSaldo() - saque);
+                System.out.println("saque realizado com sucesso!");
+            }
+        } else{
+            System.out.println("Conta não encontrada! Tente novamente.");
+        }
     }
-    public void pagarMensal(){
+    public void depositar() {
+        System.out.println("Digite o número da sua conta:");
+        int numDigitado4;
+        try {
+            numDigitado4 = scan.nextInt();
+            scan.nextLine(); // Limpar o buffer do scanner após a leitura do inteiro
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. O número da conta deve ser um valor inteiro.");
+            scan.nextLine(); // Limpar o buffer do scanner após o erro
+            return;
+        }
 
-    }
-    public void Banco(){
-        this.setSaldo(0);
-        this.setStatus(false);
+        Pessoa cliente = buscarConta(numDigitado4);
+        if (cliente != null) {
+            System.out.println("Seu saldo atual: " + cliente.getSaldo());
+            System.out.println("Digite o valor do depósito:");
+            float vDeposito;
+            try {
+                vDeposito = scan.nextFloat();
+                scan.nextLine(); // Limpar o buffer do scanner após a leitura do float
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. O valor do depósito deve ser um número.");
+                scan.nextLine(); // Limpar o buffer do scanner após o erro
+                return;
+            }
+            if (vDeposito > 0) {
+                float novoSaldo = cliente.getSaldo() + vDeposito;
+                cliente.setSaldo(novoSaldo);
+                System.out.println("Depósito realizado com sucesso! Seu novo saldo é: " + cliente.getSaldo());
+            } else {
+                System.out.println("Valor inválido para depósito. O valor deve ser positivo.");
+            }
+        } else {
+            System.out.println("Conta não encontrada! Tente novamente.");
+        }
     }
 
+    public int getNumConta() {
+        return numConta;
+    }
+
+    public void setNumConta(int numConta) {
+        this.numConta = numConta;
+    }
+
+    public float getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(float saldo) {
+        this.saldo = saldo;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public boolean isStatusConta() {
+        return statusConta;
+    }
+
+    public void setStatusConta(boolean statusConta) {
+        this.statusConta = statusConta;
+    }
 }
