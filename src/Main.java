@@ -1,7 +1,26 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main{
     public static void main(String args[]){
+
+        /*String url = "jdbc:sqlserver://localhost:1433;database=master;";
+        String user = "sa";
+        String password = "Cazarine2003";
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection connection = DriverManager.getConnection(url, user, password);
+
+            connection.close();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
+
         Scanner scan = new Scanner(System.in);
         Banco banco = new Banco();
 
