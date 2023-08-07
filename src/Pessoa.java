@@ -13,6 +13,10 @@ public class Pessoa {
         this.saldo = saldo;
     }
 
+    public Pessoa() {
+
+    }
+
     public String getNome() {
         return nome;
     }
