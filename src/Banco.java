@@ -1,11 +1,12 @@
+import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
-import java.sql.PreparedStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class Banco{
+public class Banco {
     private int numConta;
     private float saldo;
     private String tipo;
@@ -14,7 +15,7 @@ public class Banco{
 
     Scanner scan = new Scanner(System.in);
 
-    public Banco(){
+    public Banco() {
         this.listaClientes = new ListaLigada();
     }
 
@@ -28,7 +29,7 @@ public class Banco{
             return;
         }
         System.out.println("Crie uma senha: ");
-        String senha  = scan.nextLine();
+        String senha = scan.nextLine();
         System.out.println("Digite o cpf: ");
         double cpf = scan.nextDouble();
         scan.nextLine();
@@ -44,7 +45,7 @@ public class Banco{
 
         listaClientes.adicionarPessoa(cliente);
 
-        try{
+        try {
             Connection conexao = ConexaoBD.obterConexao();
             String sql = "INSERT INTO TabelaClientes3 (nome, email, senha, cpf, numConta, saldo)" +
                     "VALUES (?, ?, ?, ?, ?, ?)";
@@ -57,40 +58,72 @@ public class Banco{
             stmt.setFloat(6, cliente.getSaldo());
             stmt.executeUpdate();
             stmt.close();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean verificarEmailCadastrado(String email){
-        for (Pessoa cliente : listaClientes){
-            if(cliente.getEmail().equalsIgnoreCase(email)){
+    private boolean verificarEmailCadastrado(String email) {
+        for (Pessoa cliente : listaClientes) {
+            if (cliente.getEmail().equalsIgnoreCase(email)) {
                 return true;
             }
         }
         return false;
     }
+
     public void fecharConta() {
         System.out.println("Digite o número da conta");
         int numDigitado = scan.nextInt();
         scan.nextLine();
 
-        Pessoa cliente  = buscarConta(numDigitado);
-        if(cliente != null){
+        Pessoa cliente = buscarConta(numDigitado);
+        if (cliente != null) {
             listaClientes.removerPessoa(cliente);
             System.out.println("Conta removida com sucesso!");
-        }else{
+            try {
+                Connection conexao = ConexaoBD.obterConexao();
+                String sql = "DELETE FROM TabelaClientes3 WHERE numConta = ?";
+                PreparedStatement stmt = conexao.prepareStatement(sql);
+                stmt.setInt(1, numDigitado);
+                stmt.executeUpdate();
+                stmt.close();
+                conexao.close();
+                System.out.println("Conta excluída do sistema! ");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Erro ao excluir!");
+            }
+        } else {
             System.out.println("Conta não encontrada!");
         }
     }
 
-    private Pessoa buscarConta(int numDigitado){
-        for(Pessoa cliente : listaClientes){
-            if(cliente.getNumConta() == numDigitado){
+    private Pessoa buscarConta(int numConta) {
+        try {
+            Connection conexao = ConexaoBD.obterConexao();
+            String sql = "SELECT * FROM TabelaClientes3 WHERE numConta = ?";
+            PreparedStatement stmt = conexao.prepareStatement(sql);
+            stmt.setInt(1, numConta);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Pessoa cliente = new Pessoa();
+                cliente.setNome(rs.getString("nome"));
+                cliente.setEmail(rs.getString("email"));
+                cliente.setSenha(rs.getString("senha"));
+                cliente.setNumConta(rs.getInt("numConta"));
+                cliente.setSaldo(rs.getFloat("saldo"));
+                cliente.setCpf(rs.getDouble("cpf"));
                 return cliente;
+            } else {
+                return null;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao buscar!");
+            return null;
         }
-        return null;
     }
     public void acessarConta(){
         System.out.println("Digite o número da conta que deseja acessar: ");
@@ -118,9 +151,23 @@ public class Banco{
             System.out.println("Quanto deseja sacar? ");
             float saque = scan.nextFloat();
             if(saque > cliente.getSaldo()){
+                //float novoSaldo2 = cliente.getSaldo() - saque;
                 System.out.println("Você nao tem dinheiro para realizar esse saque ");
             }else{
-                this.setSaldo(cliente.getSaldo() - saque);
+                float novoSaldo2 = cliente.getSaldo() - saque;
+                try{
+                    Connection conexao = ConexaoBD.obterConexao();
+                    String sql = "UPDATE TabelaClientes3 SET saldo = ? WHERE numConta = ?";
+                    PreparedStatement stmt = conexao.prepareStatement(sql);
+                    stmt.setFloat(1, novoSaldo2);
+                    stmt.setInt(2, numDigitado3);
+                    stmt.executeUpdate();
+                    stmt.close();
+                    conexao.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                    System.out.println("Erro ao atualizar!");
+                }
                 System.out.println("saque realizado com sucesso!");
             }
         } else{
@@ -138,7 +185,6 @@ public class Banco{
             scan.nextLine(); // Limpar o buffer do scanner após o erro
             return;
         }
-
         Pessoa cliente = buscarConta(numDigitado4);
         if (cliente != null) {
             System.out.println("Seu saldo atual: " + cliente.getSaldo());
@@ -156,6 +202,19 @@ public class Banco{
                 float novoSaldo = cliente.getSaldo() + vDeposito;
                 cliente.setSaldo(novoSaldo);
                 System.out.println("Depósito realizado com sucesso! Seu novo saldo é: " + cliente.getSaldo());
+                try{
+                    Connection conexao = ConexaoBD.obterConexao();
+                    String sql = "UPDATE TabelaClientes3 SET saldo = ? WHERE numConta = ?";
+                    PreparedStatement stmt = conexao.prepareStatement(sql);
+                    stmt.setFloat(1, novoSaldo);
+                    stmt.setInt(2, numDigitado4);
+                    stmt.executeUpdate();
+                    stmt.close();
+                    conexao.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                    System.out.println("Erro ao atualizar!");
+                }
             } else {
                 System.out.println("Valor inválido para depósito. O valor deve ser positivo.");
             }

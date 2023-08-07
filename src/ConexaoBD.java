@@ -3,7 +3,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoBD {
-    private static final String URL = "jdbc:sqlserver://localhost:1443;databaseName=master";
+    //private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=master;user=sa;password=Cazarine2003;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
+    public static final String URL = "jdbc:sqlserver://localhost:1433;database=master;user=sa;password=Cazarine2003;trustServerCertificate=false; encrypt=false";
+
     private static final String USUARIO = "sa";
     private static final String SENHA = "Cazarine2003";
 
@@ -13,7 +15,7 @@ public class ConexaoBD {
         try{
             if(conexao == null || conexao.isClosed()){
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                conexao = DriverManager.getConnection(URL, USUARIO, SENHA);
+                conexao = DriverManager.getConnection(URL);
             }
             return conexao;
         } catch (ClassNotFoundException | SQLException e){
