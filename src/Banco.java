@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 public class Banco {
     private int numConta;
@@ -20,28 +21,36 @@ public class Banco {
     }
 
     public void abrirConta() {
-        System.out.println("digite seu nome: ");
-        String nome = scan.nextLine();
-        System.out.println("digite seu email: ");
-        String email = scan.nextLine();
-        if (verificarEmailCadastrado(email)) {
-            System.out.println("Este email ja está cadastrado á uma conta, tente novamnte!");
+        String nome = JOptionPane.showInputDialog("digite seu nome: ");
+        if(nome == null || nome.trim().isEmpty()){
+            JOptionPane.showMessageDialog(null,"Nome inválido");
             return;
         }
-        System.out.println("Crie uma senha: ");
-        String senha = scan.nextLine();
-        System.out.println("Digite o cpf: ");
-        double cpf = scan.nextDouble();
-        scan.nextLine();
-        System.out.println("Digite o tipo de conta: Corrente ou Poupança");
-        tipo = scan.nextLine();
+
+        String email = JOptionPane.showInputDialog("digite seu email: ");
+        if (verificarEmailCadastrado(email)) {
+            JOptionPane.showMessageDialog(null,"Este email ja está cadastrado á uma conta, tente novamnte!");
+            return;
+        }
+        String senha = JOptionPane.showInputDialog("Crie uma senha: ");
+
+        double cpf;
+        try{
+            String cpfStr = JOptionPane.showInputDialog("Digite o cpf: ");
+            cpf = Double.parseDouble(cpfStr);
+        }catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"cpf inválido");
+            return;
+        }
+
+        String tipo = JOptionPane.showInputDialog("Digite o tipo de conta: Corrente ou Poupança");
 
         Random random = new Random();
         numConta = 1000 + random.nextInt(9000);
-        System.out.println("parabens! voce criou sua conta " + this.getTipo() + "!"
+        JOptionPane.showMessageDialog(null,"parabens! voce criou sua conta " + this.getTipo() + "!"
                 + "Número da conta: " + this.getNumConta());
 
-        Pessoa cliente = new Pessoa(nome, email, senha, cpf, numConta, saldo);
+        Pessoa cliente = new Pessoa(nome, email, senha , cpf, numConta, saldo);
 
         listaClientes.adicionarPessoa(cliente);
 
@@ -73,14 +82,20 @@ public class Banco {
     }
 
     public void fecharConta() {
-        System.out.println("Digite o número da conta");
-        int numDigitado = scan.nextInt();
-        scan.nextLine();
+        String numDigitadoStr = JOptionPane.showInputDialog("Digite o número da conta");
+        int numDigitado;
+
+        try{
+            numDigitado = Integer.parseInt(numDigitadoStr);
+        }catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"Entrada Inválida");
+            return;
+        }
 
         Pessoa cliente = buscarConta(numDigitado);
         if (cliente != null) {
             listaClientes.removerPessoa(cliente);
-            System.out.println("Conta removida com sucesso!");
+            JOptionPane.showMessageDialog(null,"Conta removida com sucesso!");
             try {
                 Connection conexao = ConexaoBD.obterConexao();
                 String sql = "DELETE FROM TabelaClientes3 WHERE numConta = ?";
@@ -89,13 +104,13 @@ public class Banco {
                 stmt.executeUpdate();
                 stmt.close();
                 conexao.close();
-                System.out.println("Conta excluída do sistema! ");
+                JOptionPane.showMessageDialog(null,"Conta excluída do sistema! ");
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.out.println("Erro ao excluir!");
+                JOptionPane.showMessageDialog(null,"Erro ao excluir!");
             }
         } else {
-            System.out.println("Conta não encontrada!");
+            JOptionPane.showMessageDialog(null,"Conta não encontrada!");
         }
     }
 
@@ -121,38 +136,57 @@ public class Banco {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Erro ao buscar!");
+            JOptionPane.showMessageDialog(null,"Erro ao buscar!");
             return null;
         }
     }
     public void acessarConta(){
-        System.out.println("Digite o número da conta que deseja acessar: ");
-        int numDigitado2 = scan.nextInt();
-        scan.nextLine();
+        String numDigitado2Str = JOptionPane.showInputDialog("Digite o número da conta que deseja acessar: ");
+        int numDigitado2;
+
+        try{
+            numDigitado2 = Integer.parseInt(numDigitado2Str);
+        }catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null, "Entrada inválida");
+            return;
+        }
 
         Pessoa cliente = buscarConta(numDigitado2);
         if(cliente != null){
-            System.out.println("Conta acessada com sucesso! Dados: ");
-            System.out.println("tipo da conta: " + getTipo());
-            System.out.println("Saldo: " + cliente.getSaldo());
+            JOptionPane.showMessageDialog(null,"Conta acessada com sucesso! Dados: ");
+            JOptionPane.showMessageDialog(null,"tipo da conta: " + getTipo());
+            JOptionPane.showMessageDialog(null,"Saldo: " + cliente.getSaldo());
         }else{
-            System.out.println("Conta não encontrada! tente novamente.");
+            JOptionPane.showMessageDialog(null,"Conta não encontrada! tente novamente.");
             return;
         }
     }
     public void sacar(){
-        System.out.println("Digite o número da sua conta.");
-        int numDigitado3 = scan.nextInt();
-        scan.nextLine();
+        String numDigitado3Str = JOptionPane.showInputDialog("Digite o número da sua conta.");
+        int numDigitado3;
+
+        try{
+            numDigitado3 = Integer.parseInt(numDigitado3Str);
+        }catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null,"Entrada inválida");
+            return;
+        }
 
         Pessoa cliente = buscarConta(numDigitado3);
         if(cliente != null){
-            System.out.println("seu saldo: " + cliente.getSaldo());
-            System.out.println("Quanto deseja sacar? ");
-            float saque = scan.nextFloat();
+            JOptionPane.showMessageDialog(null,"seu saldo: " + cliente.getSaldo());
+            String saqueStr = JOptionPane.showInputDialog("Quanto deseja sacar? ");
+            float saque;
+
+            try{
+                saque = Float.parseFloat(saqueStr);
+            }catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Entrada inválida");
+                return;
+            }
+
             if(saque > cliente.getSaldo()){
-                //float novoSaldo2 = cliente.getSaldo() - saque;
-                System.out.println("Você nao tem dinheiro para realizar esse saque ");
+                JOptionPane.showMessageDialog(null,"Você nao tem dinheiro para realizar esse saque ");
             }else{
                 float novoSaldo2 = cliente.getSaldo() - saque;
                 try{
@@ -166,42 +200,38 @@ public class Banco {
                     conexao.close();
                 }catch (SQLException e){
                     e.printStackTrace();
-                    System.out.println("Erro ao atualizar!");
+                    JOptionPane.showMessageDialog(null,"Erro ao atualizar!");
                 }
-                System.out.println("saque realizado com sucesso!");
+                JOptionPane.showMessageDialog(null,"saque realizado com sucesso!");
             }
         } else{
-            System.out.println("Conta não encontrada! Tente novamente.");
+            JOptionPane.showMessageDialog(null,"Conta não encontrada! Tente novamente.");
         }
     }
     public void depositar() {
-        System.out.println("Digite o número da sua conta:");
+        String numDigitado4Str = JOptionPane.showInputDialog("Digite o número da sua conta:");
         int numDigitado4;
         try {
-            numDigitado4 = scan.nextInt();
-            scan.nextLine(); // Limpar o buffer do scanner após a leitura do inteiro
+            numDigitado4 = Integer.parseInt(numDigitado4Str);
         } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. O número da conta deve ser um valor inteiro.");
-            scan.nextLine(); // Limpar o buffer do scanner após o erro
+            JOptionPane.showMessageDialog(null,"Entrada inválida. O número da conta deve ser um valor inteiro.");
             return;
         }
         Pessoa cliente = buscarConta(numDigitado4);
         if (cliente != null) {
-            System.out.println("Seu saldo atual: " + cliente.getSaldo());
-            System.out.println("Digite o valor do depósito:");
+            JOptionPane.showInputDialog(null,"Seu saldo atual: " + cliente.getSaldo());
+            String vDepositoStr = JOptionPane.showInputDialog("Digite o valor do depósito:");
             float vDeposito;
             try {
-                vDeposito = scan.nextFloat();
-                scan.nextLine(); // Limpar o buffer do scanner após a leitura do float
+                vDeposito = Float.parseFloat(vDepositoStr);
             } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. O valor do depósito deve ser um número.");
-                scan.nextLine(); // Limpar o buffer do scanner após o erro
+                JOptionPane.showMessageDialog(null,"Entrada inválida. O valor do depósito deve ser um número.");
                 return;
             }
             if (vDeposito > 0) {
                 float novoSaldo = cliente.getSaldo() + vDeposito;
                 cliente.setSaldo(novoSaldo);
-                System.out.println("Depósito realizado com sucesso! Seu novo saldo é: " + cliente.getSaldo());
+                JOptionPane.showMessageDialog(null,"Depósito realizado com sucesso! Seu novo saldo é: " + cliente.getSaldo());
                 try{
                     Connection conexao = ConexaoBD.obterConexao();
                     String sql = "UPDATE TabelaClientes3 SET saldo = ? WHERE numConta = ?";
@@ -213,13 +243,13 @@ public class Banco {
                     conexao.close();
                 }catch (SQLException e){
                     e.printStackTrace();
-                    System.out.println("Erro ao atualizar!");
+                    JOptionPane.showMessageDialog(null,"Erro ao atualizar!");
                 }
             } else {
-                System.out.println("Valor inválido para depósito. O valor deve ser positivo.");
+                JOptionPane.showMessageDialog(null,"Valor inválido para depósito. O valor deve ser positivo.");
             }
         } else {
-            System.out.println("Conta não encontrada! Tente novamente.");
+            JOptionPane.showMessageDialog(null,"Conta não encontrada! Tente novamente.");
         }
     }
 
