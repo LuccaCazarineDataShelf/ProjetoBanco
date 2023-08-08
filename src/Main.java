@@ -1,25 +1,31 @@
 import java.util.Scanner;
-
+import javax.swing.JOptionPane;
 public class Main{
     public static void main(String args[]){
 
         Scanner scan = new Scanner(System.in);
         Banco banco = new Banco();
 
-        System.out.println("Bem Vindo ao Banco!");
+        JOptionPane.showMessageDialog(null,"Bem Vindo ao Banco!");
 
         while(true){
-            System.out.println("\nEscolha uma opção");
-            System.out.println("1 - Abrir conta");
-            System.out.println("2 - Fechar Conta");
-            System.out.println("3 - Acessar conta");
-            System.out.println("4 - Sacar");
-            System.out.println("5 - Depositar");
-            System.out.println("0 - sair");
-            System.out.println("Opcão: ");
+            String opcaoStr = JOptionPane.showInputDialog("\nEscolha uma opção"
+                    + "\n1 - Abrir conta"
+                    + "\n2 - Fechar Conta"
+                    + "\n3 - Acessar conta"
+                    + "\n4 - Sacar"
+                    + "\n5 - Depositar"
+                    + "\n0 - sair"
+                    + "\nOpcão: ");
 
-            int opcao = scan.nextInt();
-            scan.nextInt();
+            int opcao;
+
+            try{
+                opcao = Integer.parseInt(opcaoStr);
+            }catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null, "Opção inválida");
+                continue;
+            }
 
             switch (opcao){
                 case 1:
@@ -38,11 +44,10 @@ public class Main{
                     banco.depositar();
                     break;
                 case 0:
-                    scan.close();
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("opcão inválida");
+                    JOptionPane.showMessageDialog(null,"opcão inválida");
                     break;
             }
         }
