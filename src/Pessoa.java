@@ -1,16 +1,17 @@
 public class Pessoa {
-    private String nome, email, senha;
+    private String nome, email, senha, tipo;
     private double cpf;
     private int numConta;
     private float saldo;
 
-    public Pessoa(String nome, String email, String senha, double cpf, int numConta, float saldo){
+    public Pessoa(String nome, String email, String senha, double cpf, int numConta, float saldo, String tipo){
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.cpf = cpf;
         this.numConta = numConta;
         this.saldo = saldo;
+        this.tipo = tipo;
     }
 
     public Pessoa() {
@@ -61,5 +62,13 @@ public class Pessoa {
 
     public void setSaldo(float saldo) {
         this.saldo = saldo;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }

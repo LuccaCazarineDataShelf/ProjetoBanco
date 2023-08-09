@@ -48,16 +48,16 @@ public class Banco {
         Random random = new Random();
         numConta = 1000 + random.nextInt(9000);
         JOptionPane.showMessageDialog(null,"parabens! voce criou sua conta " + this.getTipo() + "!"
-                + "Número da conta: " + this.getNumConta());
+                + "\nNúmero da conta: " + this.getNumConta());
 
-        Pessoa cliente = new Pessoa(nome, email, senha , cpf, numConta, saldo);
+        Pessoa cliente = new Pessoa(nome, email, senha , cpf, numConta, saldo, tipo);
 
         listaClientes.adicionarPessoa(cliente);
 
         try {
             Connection conexao = ConexaoBD.obterConexao();
-            String sql = "INSERT INTO TabelaClientes3 (nome, email, senha, cpf, numConta, saldo)" +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO TabelaClientes3 (nome, email, senha, cpf, numConta, saldo, tipo)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = conexao.prepareStatement(sql);
             stmt.setString(1, cliente.getNome());
             stmt.setString(2, cliente.getEmail());
@@ -65,6 +65,7 @@ public class Banco {
             stmt.setDouble(4, cliente.getCpf());
             stmt.setInt(5, cliente.getNumConta());
             stmt.setFloat(6, cliente.getSaldo());
+            stmt.setString(7, cliente.getTipo());
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
@@ -130,6 +131,7 @@ public class Banco {
                 cliente.setNumConta(rs.getInt("numConta"));
                 cliente.setSaldo(rs.getFloat("saldo"));
                 cliente.setCpf(rs.getDouble("cpf"));
+                cliente.setTipo(rs.getString("tipo"));
                 return cliente;
             } else {
                 return null;
@@ -153,9 +155,11 @@ public class Banco {
 
         Pessoa cliente = buscarConta(numDigitado2);
         if(cliente != null){
-            JOptionPane.showMessageDialog(null,"Conta acessada com sucesso! Dados: ");
-            JOptionPane.showMessageDialog(null,"tipo da conta: " + getTipo());
-            JOptionPane.showMessageDialog(null,"Saldo: " + cliente.getSaldo());
+            JOptionPane.showMessageDialog(null,"\nConta acessada com sucesso! \nDados: "
+                        +"\ntipo da conta: " + getTipo()
+                        +"\nSaldo: " + cliente.getSaldo()
+            );
+
         }else{
             JOptionPane.showMessageDialog(null,"Conta não encontrada! tente novamente.");
             return;
