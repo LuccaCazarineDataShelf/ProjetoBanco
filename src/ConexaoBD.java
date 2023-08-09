@@ -3,7 +3,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoBD {
-    //private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=master;user=sa;password=Cazarine2003;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
     public static final String URL = "jdbc:sqlserver://localhost:1433;database=master;user=sa;password=Cazarine2003;trustServerCertificate=false; encrypt=false";
 
     private static final String USUARIO = "sa";
